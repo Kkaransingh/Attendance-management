@@ -12,9 +12,12 @@ const StudentModel = require('./models/Student1');
 const AttendanceModel = require('./models/Attendance2');
 app.use(express.json());
 app.use(cors({ origin: ["http://localhost:3000", "https://mern-attendance-app.onrender.com"] }));
-mongoose.connect('// add your mongodb connection url', {
-    useNewUrlParser: true,
-});
+mongoose.connect('mongodb+srv://rockerpriyam123:qZMbIFkXaICDEgGg@attendance.ulcmg.mongodb.net/attendance?retryWrites=true&w=majority')
+    .then(() => console.log('Connected to MongoDB successfully'))
+    .catch((error) => console.error('Error connecting to MongoDB:', error));
+
+
+
 
 app.post('/form/insert', async (req, res) => {
     const {

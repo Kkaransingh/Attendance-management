@@ -13,52 +13,47 @@ const StudentSchema = new mongoose.Schema({
         type: String,
     },
     Branch_of_studying: {
-        type:String,
+        type: String,
     },
     Date_of_Birth: {
-        type:String
+        type: String,
     },
     Gender: {
-        type:String
+        type: String,
     },
     Community: {
-        type:String
+        type: String,
     },
     Minority_Community: {
-        type:String
+        type: String,
     },
     Blood_Group: {
-        type:String
+        type: String,
     },
     Aadhar_number: {
-        type:String
+        type: String,
     },
     Mobile_number: {
-        type:String
+        type: String,
     },
     Email_id: {
-        type:String
+        type: String,
     }
-
 });
+
 // Middleware to remove associated attendance records when a student is removed
 StudentSchema.pre('findOneAndRemove', async function (next) {
-    // Store the student ID before removal
-    console.log(this._conditions);
-    this._idToDelete = this._conditions._id;
-    console.log(this._idToDelete);
     try {
-    await mongoose.model('Attendance2').updateMany(
-      {},
-      { $pull: { 'attendanceRecords': { 'studentId': this._conditions._id } } }
-    );
-    next();
-  } catch (error) {
-    return next(error);
-  }
-  
+        // Remove attendance records associated with the student being deleted
+        await mongoose.model('Attendance2').updateMany(
+            {},
+            { $pull: { attendanceRecords: { studentId: this._conditions._id } } }
+        );
+        next();
+    } catch (error) {
+        next(error);
+    }
 });
 
-
-const Student = mongoose.model("Student1", StudentSchema)
+const Student = mongoose.model('Student1', StudentSchema);
 module.exports = Student;
