@@ -8,41 +8,40 @@ const Login = ({ user }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUpActive, setIsSignUpActive] = useState(true);
+  const [error, setError] = useState("");
 
   const handleMethodChange = () => {
     setIsSignUpActive(!isSignUpActive);
+    setError(""); // Clear error when switching modes
   };
 
-  const handleSignUp = () => {
-    if (!email || !password) return;
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(user);
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-      });
+  const handleSignUp = async () => {
+    if (!email || !password) {
+      setError("Email and password are required.");
+      return;
+    }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log(userCredential.user);
+      setError(""); // Clear error on success
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
-  const handleSignIn = () => {
-    if (!email || !password) return;
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(user);
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-      });
+  const handleSignIn = async () => {
+    if (!email || !password) {
+      setError("Email and password are required.");
+      return;
+    }
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log(userCredential.user);
+      setError(""); // Clear error on success
+    } catch (error) {
+      setError(error.message);
+    }
   };
-
-  const handleEmailChange = (event) => setEmail(event.target.value);
-  const handlePasswordChange = (event) => setPassword(event.target.value);
 
   if (user) {
     return <Navigate to="/home" />;
@@ -59,34 +58,40 @@ const Login = ({ user }) => {
             <ul className="login-page__list">
               <li className="login-page__item">
                 <label htmlFor="email" className="login-page__label">Email</label>
-                <input type="text" id="email" onChange={handleEmailChange} className="login-page__input" />
+                <input
+                  type="text"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="login-page__input"
+                />
               </li>
               <li className="login-page__item">
                 <label htmlFor="password" className="login-page__label">Password</label>
                 <input
                   type="password"
                   id="password"
-                  onChange={handlePasswordChange}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="login-page__input"
                 />
               </li>
             </ul>
-
+            {error && <p className="error-message">{error}</p>}
             {isSignUpActive && (
               <button type="button" onClick={handleSignUp} className="login-page__button">
-                Sign Up <span className="login-page__spinner"></span>
+                Sign Up
               </button>
             )}
             {!isSignUpActive && (
               <button type="button" onClick={handleSignIn} className="login-page__button">
-                Sign In <span className="login-page__spinner"></span>
+                Sign In
               </button>
             )}
           </fieldset>
-          {isSignUpActive && <a onClick={handleMethodChange} className="login-page__link">Login</a>}
-          {!isSignUpActive && (
-            <a onClick={handleMethodChange} className="login-page__link">Create an account</a>
-          )}
+          <a onClick={handleMethodChange} className="login-page__link">
+            {isSignUpActive ? "Login" : "Create an account"}
+          </a>
         </form>
       </section>
     </div>
